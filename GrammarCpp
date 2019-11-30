@@ -1,0 +1,1228 @@
+# [C] 포인터
+- 포인터 기본
+    int* ptr_num = &num;
+    printf("ptr_num이 가리키는 주소값은 %#x입니다.\n", ptr);
+    printf("ptr_num이 가리키는 주소에 저장된 값은 %d입니다.\n", *ptr);
+- 포인터의 포인터
+    int num = 10;
+    int* ptr_num = &num;
+    int** pptr_num = &ptr_num;
+    printf("ptr_num이 가리키는 주소에 저장된 값은 %d입니다.\n", *ptr_num);
+    printf("ptr_num이 가리키는 주소에 저장된 포인터가 가리키는 주소에 저장된 값은 %d입니다.\n", **pptr_num);
+- void 포인터
+    int num = 10;
+    void* ptr_num = &num;
+    printf("void 포인터 ptr_num이 가리키는 주소에 저장된 값은 %d입니다.\n", *(int*)ptr_num); // 10 출력
+    *(int*)ptr_num = 20;
+    printf("void 포인터 ptr_num이 가리키는 주소에 저장된 값은 %d입니다.\n", *(int*)ptr_num); // 20 출력
+- 함수 포인터
+- Null 포인터
+
+# [C] 포인터 & 배열
+- 포인터와 배열
+    int arr[3] = {10, 20, 30};
+    int* ptr_arr = arr;
+    printf("배열의 이름을 이용하여 배열 요소에 접근 : %d %d %d\n", arr[0], arr[1], arr[2]); // 10 20 30 출력
+    printf("포인터를 이용하여 배열 요소에 접근 : %d %d %d\n", ptr_arr[0], ptr_arr[1], ptr_arr[2]); // 10 20 30 출력
+    printf("배열의 이름으로 포인터 연산을 해 배열 요소에 접근 : %d %d %d\n", *(arr+0), *(arr+1), *(arr+2)); // 10 20 30 출력
+    // arr이 배열의 이름이거나 포인터이고 n이 정수라면, arr[n] == *(arr+n)
+- 포인터 배열(포인터 변수를 저장할 수 있는 배열)
+    int num1 = 10, num2 = 20, num3 = 30;
+    int* arr[3] = {&num1, &num2, &num3}' // int형 포인터 배열 선언
+    printf("%d %d %d\n", *arr[0], *arr[1], *arr[2]); // 10 20 30 출력
+- 배열 포인터(배열을 가리킬 수 있는 포인터, 2차원 이상의 배열을 가리킬 때 포인터를 통해 배열과 같은 인덱싱을 할 수 있음)
+    int arr[2][3] = { { 10, 20, 30 }, { 40, 50, 60 } };
+    int (*pArr)[3] = arr; // 배열 포인터 선언
+    printf("%d %d\n", *arr[0], *arr[1]); // 0행과 1행의 부분 배열의 시작 주소가 가리키는 메모리의 데이터인 10과 40을 출력
+    printf("%d %d\n", arr[1][1], pArr[1][1]); // 배열 이름과 배열 포인터로 참조, 둘 다 50이 출력됨
+
+# [C] 메모리의 동적 할당
+- 메모리의 영역 구조(낮은 주소 → 높은 주소) : Code / Data(전역변수, 정적변수) / Heap(사용자의 동적 할당) / Stack(지역변수, 매개변수)
+- 컴파일 타임에 메모리 크기가 결정됨 : 데이터 영역, 스택 영역
+- 런 타임에 메모리 크기가 결정됨 : 힙 영역
+- 메모리 누수(memory leak) : 사용 끝난 메모리를 해제하지 않아 생기는 메모리 부족 현상
+
+# [C] 구조체의 정의와 선언
+#include <stdio.h>
+
+struct book
+{
+    char title[30];
+    char author[30];
+    int price;
+};
+
+int main(void)
+{
+    struct book my_book = {"HTML과 CSS", "홍길동", 28000};
+    struct book your_book = {"Java Language", "미정", 15000};
+
+    printf("나의 책 : %s / %s / %d\n", my_book.title, my_book.author, my_book.price);
+    printf("너의 책 : %s / %s / %d\n", your_book.title, your_book.author, your_book.price);
+
+    return 0;
+}
+
+# [C] 구조체와 포인터
+#include <stdio.h>
+#include <string.h>
+
+typedef struct
+{
+    char title[30];
+    char author[30];
+    int price;
+} book;
+
+int main(void)
+{
+    book text_book[3] =
+    {
+        {"국어", "홍길동", 15000},
+        {"영어", "이순신", 18000},
+        {"수학", "강감찬", 21000}
+    };
+	book new_book = {"과목", "작가", 0};
+	book* ptr_text_book ; // 구조체 포인터 선언
+
+	ptr_text_book = &new_book;
+
+	strcpy((*ptr_text_book).title, "과학"); // 참조연산자(*)를 이용하는 방법
+	strcpy(ptr_text_book->author, "유관순"); // 화살표연산자(->)를 이용하는 방법
+	new_book.price = 24000; // 구조체 변수를 이용한 직접 수정
+
+    printf("각 교과서의 이름 : %s / %s / %s\n", text_book[0].title, text_book[1].title, text_book[2].title);
+	printf("새 책 : %s / %s / %d원\n", new_book.title, new_book.author, new_book.price);
+
+    return 0;
+}
+
+# [C] 함수와 구조체
+#include <stdio.h>
+
+typedef struct
+{
+	int savings;
+	int loan;
+} Prop;
+
+Prop initProperty(void);
+int calcProperty(const Prop*);
+
+int main(void)
+{
+	Prop prop;
+	int hong_prop;
+
+	prop = initProperty();
+	hong_prop = calcProperty(&prop);
+
+	printf("적금 %d원 - 대출 %d원 = 재산 %d원", prop.savings, prop.loan, hong_prop);
+
+	return 0;
+}
+
+Prop initProperty(void)
+{
+	Prop hong = {10000000, 4000000};
+	return hong; // 구조체를 함수의 반환값으로 반환함
+}
+
+int calcProperty(const Prop* money) // const 키워드를 사용하여 구조체의 데이터를 직접 수정하는 것을 방지함
+{
+	return (money->savings - money->loan);
+}
+
+# [C] 중첩된 구조체
+#include <stdio.h>
+
+struct name
+{
+	char first[30];
+	char last[30];
+};
+
+typedef struct
+{
+	struct name friend_name;
+	char address[30];
+	char job[30];
+} Friends;
+
+int main(void)
+{
+	Friends hong =
+	{
+		{ "길동", "홍" },
+		"서울시 강남구 역삼동",
+		"학생"
+	};
+
+	printf("주소 : %s\n", hong.address);
+	printf("%s%s에게,\n", hong.friend_name.last, hong.friend_name.first);
+	printf("아직 %s이지? 잘 지내고 다음에 보자~", hong.job);
+
+	return 0;
+}
+
+# [C] 바이트 패딩
+#include <stdio.h>
+
+typedef struct
+{
+	char a;
+	int b;
+	double c;
+} TypeSize;
+
+int main(void)
+{
+	printf("구조체 각 멤버의 Type Size(byte) : %d, %d, %d\n", sizeof(char), sizeof(int), sizeof(double));
+	printf("구조체 전체의 Type Size(byte) : %d\n", sizeof(TypeSize)); // 바이트 패딩
+
+	return 0;
+}
+
+# [C] 매크로와 함수
+#include <stdio.h>
+#define XN(n) x ## n
+#define SQR_XN(n) printf("x"#n"의 제곱은 %d입니다.\n", ((x ## n)*(x ## n)));
+
+int main(void)
+{
+	int XN(1) = 10;
+	int XN(2) = 20;
+
+	SQR_XN(1);
+	SQR_XN(2);
+
+	return 0;
+}
+
+# [C] 리틀 엔디안 vs 빅 엔디안
+#include <stdio.h>
+
+int main(void)
+{
+	int i;
+	int test = 0x12345678;
+	char* ptr = (char*)&test;
+
+	for(i = 0; i < sizeof(int); i++)
+	{
+		printf("%x", ptr[i]); // 78563412로 출력되면 리틀 엔디안 방식, 12345678로 출력되면 빅 엔디안 방식
+	}
+
+	return 0;
+}
+
+# [C++] 리터럴 상수
+#include <iostream>
+using namespace std;
+
+int main(void)
+{
+	int a = 10;
+	cout << "숫자 10을 10진수로 표현하면 " << a << "이며, " << endl;
+	cout << oct;
+	cout << "숫자 10을 8진수로 표현하면 " << a << "이며, " << endl;
+	cout << hex;
+	cout << "숫자 10을 16진수로 표현하면 " << a << "입니다." << endl;
+	
+	return 0;
+}
+
+# [C++] 배열
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main(void)
+{
+	int arr_col_len, arr_row_len;
+	//int arr[3][] = { // 행의 길이를 생략하면 컴파일 오류가 발생함
+	int arr[][4] = {
+		{10, 20},
+		{30, 40, 50, 60},
+		{0, 0, 70, 80}
+	};
+	
+	arr_col_len = sizeof(arr[0]) / sizeof(arr[0][0]);				// 2차원 배열의 열의 길이를 계산함 
+	arr_row_len = (sizeof(arr) / arr_col_len) / sizeof(arr[0][0]);	// 2차원 배열의 행의 길이를 계산함 
+			
+	cout << "arr의 배열 요소의 값" << endl;
+	for (int i = 0; i < arr_row_len; i++)
+	{
+		for (int j = 0; j < arr_col_len; j++)
+		{
+			cout << setw(4) << arr[i][j];
+		}
+		cout << endl;
+	}
+	return 0;
+}
+
+# [C++] 메모리의 동적 할당
+#include <iostream>
+using namespace std;
+
+int main(void)
+{
+	int* ptr_int = new int;
+	*ptr_int = 100;
+
+	double* ptr_double = new double;
+	*ptr_double = 100.123;
+
+	cout << "int형 숫자의 값은 " << *ptr_int << "입니다." << endl;
+	cout << "int형 숫자의 메모리 주소는 " << ptr_int << "입니다." << endl;
+
+	cout << "double형 숫자의 값은 " << *ptr_double << "입니다." << endl;
+	cout << "double형 숫자의 메모리 주소는 " << ptr_double << "입니다." << endl;
+	
+	delete ptr_int;
+	delete ptr_double;
+	return 0;
+}
+
+# [C++] 함수 포인터
+#include <iostream>
+using namespace std;
+
+typedef double (*Arith)(double, double); // 새로운 함수 포인터 이름 선언
+
+double Add(double, double);
+double Sub(double, double);
+double Mul(double, double);
+double Div(double, double);
+double Calculator(double, double, Arith);
+
+int main(void)
+{
+	Arith calc = NULL; // 함수 포인터 선언
+	double num1 = 5, num2 = 6, result;
+	char oper = '*';
+
+	switch(oper)
+	{
+		case '+' :
+			calc = Add;
+			break;
+		case '-' :
+			calc = Sub;
+			break;
+		case '*' :
+			calc = Mul;
+			break;
+		case '/' :
+			calc = Div;
+			break;
+		default :
+			cout << "사칙연산(+, -, *, /)만 입력 받습니다." << endl;
+	}
+
+	result = Calculator(num1, num2, calc);
+	cout << "사칙연산의 결과는 " << result << "입니다." << endl;
+
+	return 0;
+}
+
+double Add(double num1, double num2)
+{
+	return num1 + num2;
+}
+
+double Sub(double num1, double num2)
+{
+	return num1 - num2;
+}
+
+double Mul(double num1, double num2)
+{
+	return num1 * num2;
+}
+
+double Div(double num1, double num2)
+{
+	return num1 / num2;
+}
+
+double Calculator(double num1, double num2, Arith func)
+{
+	return func(num1, num2);
+}
+
+# [C++] Call by Reference(포인터 vs 참조자)
+#include <iostream>
+using namespace std;
+
+void Swap(int*, int*); // 포인터 이용
+// void Swap(int&, int&); // 참조자 이용
+
+int main(void)
+{
+	int num1 = 3, num2 = 7;
+	cout << "변경 전 num1의 값은 " << num1 << "이며, num2의 값은 " << num2 << "입니다." << endl;
+	Swap(&num1, &num2); // 포인터 이용
+	// Swap(num1, num2); // 참조자 이용
+	cout << "변경 후 num1의 값은 " << num1 << "이며, num2의 값은 " << num2 << "입니다." << endl;
+	return 0;
+}
+
+void Swap(int *x, int *y) // 포인터 이용
+{
+	int temp;
+	
+	temp = *x;
+	*x = *y;
+	*y = temp;
+}
+
+/*
+void Swap(int& x, int& y) // 참조자 이용
+{
+	int temp;
+	
+	temp = x;
+	x = y;
+	y = temp;
+}
+*/
+
+# [C++] 구조체의 참조
+#include <iostream>
+using namespace std;
+
+struct Book
+{
+	string title;
+	string author;
+	int price;
+};
+
+void Display(const Book&);
+
+int main(void)
+{
+	Book web_book = {"HTML과 CSS", "홍길동", 28000};
+	Display(web_book);
+
+	return 0;
+}
+
+void Display(const Book& bk)
+{
+	cout << "책의 제목은 " << bk.title << "이고, ";
+	cout << "저자는 " << bk.author << "이고, ";
+	cout << "가격은 " << bk.price << "원입니다." << endl;
+}
+
+# [C++] 인라인 함수(!= 매크로 함수)
+#include <iostream>
+using namespace std;
+
+inline int Sqr(int x)
+{
+	return x * x;
+}
+
+int main(void)
+{
+	int result;
+	int x = 5;
+
+	cout << "계산 결과는 " << Sqr(10) << "입니다." << endl;
+	cout << "계산 결과는 " << Sqr(x) << "입니다." << endl;
+	cout << "계산 결과는 " << Sqr(x+3) << "입니다." << endl;
+
+	return 0;
+}
+
+# [C++] 클래스
+#include <iostream>
+using namespace std;
+
+class Book
+{
+private:
+	int current_page_;
+	void set_percent();
+public:
+	Book(const string& title, int total_page); // 생성자 원형의 정의
+	Book(const Book&); // 복사 생성자 원형의 정의
+	~Book(); // 소멸자 원형의 정의
+	string title_;
+	int total_page_;
+	double percent_;
+	void Move(int page);
+	void Open();
+	void Read();
+	const Book& ThickerBook(const Book&); // ThickerBook() 함수의 원형의 정의
+};
+
+int main(void)
+{
+	Book web_book("HTML과 CSS", 350); // 생성자의 암시적 호출
+	// Book web_book = Book("HTML과 CSS", 350); // 생성자의 명시적 호출
+	// Book web_book; // 디폴트 생성자의 암시적 호출
+	// Book *ptr_book = new Book; // 디폴트 생성자의 암시적 호출
+	// 암시적 호출 : 괄호 사용 안 함
+	// Book web_book = book(); // 디폴트 생성자의 명시적 호출
+	Book html_book("HTML 레퍼런스", 200);
+	Book copy_book(html_book); // 같은 구문 : Book copy_book = Book(html_book);
+
+	cout << "복사한 책 : " << copy_book.title_ << endl;
+	cout << "더 두꺼운 책 : " << web_book.ThickerBook(html_book).title_ << endl; // 더 두꺼운 책의 이름을 출력함
+
+	return 0;
+}
+
+Book::Book(const string& title, int total_page) // 생성자 선언
+// Book::Book(const string& title = "웹 프로그래밍", int total_page = "100"); // 디폴트 인수를 이용한 디폴트 생성자의 정의
+{
+	title_ = title;
+	total_page_ = total_page;
+	current_page_ = 0;
+	set_percent();
+}
+
+Book::Book(const Book& origin) // 복사 생성자 선언
+{
+	title_ = origin.title_;
+	total_page_ = origin.total_page_;
+	current_page_ = origin.current_page_;
+	percent_ = origin.percent_;
+}
+
+Book::~Book() // 소멸자 선언
+{
+	cout << "Book 객체의 소멸자가 호출됨" << endl;
+}
+
+void Book::set_percent()
+{
+	percent_ = (double) current_page_ / total_page_ * 100;
+}
+
+const Book& Book::ThickerBook(const Book& comp_book)
+{
+	if(comp_book.total_page_ > this->total_page_)
+	{
+		return comp_book;
+	}
+	else
+	{
+		return *this; // this 포인터
+	}
+}
+
+# [C++] 연산자 오버로딩
+#include <iostream>
+using namespace std;
+
+class Position
+{
+private:
+	double x_;
+	double y_;
+public:
+	Position(double x, double y);
+	void Display();
+	Position operator-(const Position& other); // 연산자 오버로딩
+};
+
+int main(void)
+{
+	Position pos1 = Position(3.3, 12.5);
+	Position pos2 = Position(-14.4, 7.8);
+	Position pos3 = pos1 - pos2;
+
+	pos3.Display();
+
+	return 0;
+}
+
+Position::Position(double x, double y)
+{
+	x_ = x;
+	y_ = y;
+}
+
+Position Position::operator-(const Position& other)
+{
+	return Position((x_ + other.x_)/2, (y_ + other.y_)/2);
+}
+
+void Position::Display()
+{
+	cout << "두 지점의 중점 좌표 : (" << this->x_ << ", " << this->y_ << ")" << endl;
+}
+
+# [C++] OOP 캡슐화(프렌드)
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Rect;
+
+class Diagonal
+{
+public:
+	void ShowDiagonal(const Rect& target);
+};
+
+class Rect
+{
+private:
+	double height_;
+	double width_;
+public:
+	Rect(double height, double width);
+	void ShowSize();
+	Rect operator*(double mul) const;
+	friend Rect operator*(double mul, const Rect& origin); // 프렌드 함수
+	friend void Diagonal::ShowDiagonal(const Rect& target); // 프렌드 멤버 함수
+	friend class Square; // 프렌드 클래스
+};
+
+class Square
+{
+public:
+	void ShowSquare(const Rect& target);
+};
+
+int main(void)
+{
+	Rect origin_rect(10, 20);
+	Rect rect01 = origin_rect;
+	Rect rect02 = origin_rect * 2;
+	Rect rect03 = 3 * origin_rect;
+
+	rect01.ShowSize();
+
+	Diagonal rect_diagonal;
+	rect_diagonal.ShowDiagonal(rect02);
+
+	Square rect_square;
+	rect_square.ShowSquare(rect03);
+
+	return 0;
+}
+
+Rect::Rect(double height, double width)
+{
+	height_ = height;
+	width_ = width;
+}
+
+void Rect::ShowSize()
+{
+	cout << "이 사각형의 높이는 " << this->height_ << "이고, 너비는 " << this->width_ << "입니다." << endl;
+}
+
+void Diagonal::ShowDiagonal(const Rect& target)
+{
+	double diagonal;
+	diagonal = sqrt(pow(target.height_, 2) + pow(target.width_, 2));
+
+	cout << "이 사각형의 대각선의 길이는 " << diagonal << "입니다." << endl;
+}
+
+void Square::ShowSquare(const Rect& target)
+{
+	double square;
+	square = target.height_ * target.width_;
+
+	cout << "이 사각형의 넓이는 " << square << "입니다." << endl;
+}
+
+Rect Rect::operator*(double mul) const
+{
+	return Rect(height_ * mul, width_ * mul);
+}
+
+Rect operator*(double mul, const Rect& origin)
+{
+	return origin * mul;
+}
+
+# [C++] OOP 캡슐화(정적 멤버)
+#include <iostream>
+using namespace std;
+
+class Person
+{
+private:
+	string name_;
+	int age_;
+public:
+	static int person_count_; // 정적 멤버 변수의 선언
+	static int person_count(); // 정적 멤버 함수의 선언
+	Person(const string& name, int age);
+	~Person() {person_count_--; }
+	void ShowPersonInfo();
+};
+
+int Person::person_count_ = 0; // 정적 멤버 변수의 정의 및 초기화
+
+int main(void)
+{
+	Person hong("길동", 29);
+	hong.ShowPersonInfo();
+	Person lee("순신", 35);
+	lee.ShowPersonInfo();
+
+	Person::person_count();
+
+	return 0;
+}
+
+Person::Person(const string& name, int age)
+{
+	name_ = name;
+	age_ = age;
+	cout << ++person_count_ << " 번째 사람이 입장했습니다." << endl;
+}
+
+void Person::ShowPersonInfo()
+{
+	cout << "이름은 " << name_ << "이고, 나이는 " << age_ << "입니다." << endl;
+}
+
+int Person::person_count() // 정적 멤버 함수의 정의
+{
+	cout << "현재까지 입장한 총 인원 수는 " << person_count_ << "명입니다." << endl;
+
+	return 0;
+}
+
+# [C++] OOP 상속성
+#include <iostream>
+using namespace std;
+
+class Person
+{
+private:
+	string name_;
+	int age_;
+public:
+	static int person_count_; // 정적 멤버 변수의 선언
+	static int person_count(); // 정적 멤버 함수의 선언
+	Person(const string& name, int age);
+	~Person() { person_count_--; }
+	virtual void ShowPersonInfo();
+};
+
+class Student : public Person // 파생 클래스
+{
+private:
+	int student_id_;
+public:
+	Student(int sid, const string& name, int age);
+	virtual void ShowPersonInfo(); // 기초 클래스의 멤버 함수의 재선언
+};
+
+int Person::person_count_ = 0; // 정적 멤버 변수의 정의 및 초기화
+
+int main(void)
+{
+	Person hong("길동", 29);
+	hong.ShowPersonInfo(); // 기초 클래스의 함수 호출
+	Student lee(1234, "순신", 35);
+	lee.Person::ShowPersonInfo(); // 파생 클래스의 객체에서 기초 클래스의 함수 호출
+	lee.ShowPersonInfo(); // 파생 클래스의 함수 호출
+
+	cout << "--------------------------------------------------" << endl;
+
+	Person* ptr_person;
+	ptr_person = &hong;
+	ptr_person->ShowPersonInfo();
+	ptr_person = &lee;
+	ptr_person->ShowPersonInfo();
+
+	Person::person_count(); // 정적 멤버 함수 호출
+
+	return 0;
+}
+
+Person::Person(const string& name, int age)
+{
+	name_ = name;
+	age_ = age;
+	cout << ++person_count_ << " 번째 사람이 입장했습니다." << endl;
+}
+
+Student::Student(int sid, const string& name, int age) : Person(name, age)
+{
+	student_id_ = sid;
+}
+
+void Person::ShowPersonInfo()
+{
+	cout << "이름은 " << name_ << "이고, 나이는 " << age_ << "입니다." << endl;
+}
+
+void Student::ShowPersonInfo() // 기초 클래스의 멤버 함수의 재선언
+{
+	cout << "학번은 " << student_id_ << "입니다." << endl;
+}
+
+int Person::person_count() // 정적 멤버 함수의 정의
+{
+	cout << "현재까지 입장한 총 인원 수는 " << person_count_ << "명입니다." << endl;
+
+	return 0;
+}
+
+# [C++] OOP 다형성
+#include <iostream>
+using namespace std;
+
+class Animal
+{
+public:
+	virtual ~Animal() {} // 가상 소멸자의 선언
+	virtual void Cry()=0; // 순수 가상 함수의 선언
+};
+
+class Dog : public Animal
+{
+public:
+	virtual void Cry() { cout << "멍멍!" << endl; }
+};
+
+class Cat : public Animal
+{
+public:
+	virtual void Cry() { cout << "야옹~" << endl; }
+};
+
+int main(void)
+{
+	Dog my_dog;
+	Cat my_cat;
+
+	my_dog.Cry();
+	my_cat.Cry();
+
+	return 0;
+}
+
+# [C++] 함수 템플릿
+#include <iostream>
+using namespace std;
+
+template <typename T>
+void Swap(T& x, T& y);
+
+template <> void Swap<double>(double&, double&);
+
+int main(void)
+{
+	int a = 2, b = 3;
+	cout << "a : " << a << ", b : " << b << endl;
+	Swap(a, b);
+	cout << "a : " << a << ", b : " << b << endl;
+
+	string c = "hong", d = "lee";
+	cout << "c : " << c << ", d : " << d << endl;
+	Swap(c, d);
+	cout << "c : " << c << ", d : " << d << endl;
+
+	double e = 1.234, f = 4.321;
+	cout << "e : " << e << ", f : " << f << endl;
+	Swap(e, f);
+	cout << "e : " << e << ", f : " << f << endl;
+
+	return 0;
+}
+
+template <typename T>
+void Swap(T& x, T& y)
+{
+	T temp;
+
+	temp = x;
+	x = y;
+	y = temp;
+}
+
+template <> void Swap<double>(double&, double&)
+{
+	// double형은 값을 서로 바꾸지 않음
+}
+
+# [C++] 클래스 템플릿
+#include <iostream>
+using namespace std;
+
+template <typename T>
+class Data
+{
+private:
+	T data_;
+public:
+	Data(T dt);
+	T get_data();
+};
+
+template <> class Data<double> // double 형에 대한 명시적 특수화
+{
+private:
+	double data_;
+public:
+	Data(double dt)
+	{
+		data_ = dt;
+	}
+	double get_data()
+	{
+		cout << "double형 데이터를 출력합니다." << endl;
+		return data_;
+	}
+};
+
+int main(void)
+{
+	Data<string> str_data("C++ 수업");
+	Data<int> int_data(12);
+	Data<double> double_data(3.14);
+
+	cout << "str_data : " << str_data.get_data() << endl;
+	cout << "int_data : " << int_data.get_data() << endl;
+	cout << "double_data : " << double_data.get_data() << endl;
+
+	return 0;
+}
+
+template <typename T>
+Data<T>::Data(T dt)
+{
+	data_ = dt;
+}
+
+template <typename T>
+T Data<T>::get_data()
+{
+	return data_;
+}
+
+# [C++] 스마트 포인터
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class Person
+{
+private:
+	string name_;
+	int age_;
+public:
+	Person(const string& name, int age);
+	~Person() { cout << "소멸자 호출됨" << endl; }
+	void ShowPersonInfo();
+};
+
+int main(void)
+{
+	shared_ptr<Person> hong = make_shared<Person>("길동", 29);
+	cout << "현재 소유자 수 : " << hong.use_count() << endl;
+	auto han = hong;
+	cout << "현재 소유자 수 : " << hong.use_count() << endl;
+	han.reset(); // shared_ptr인 han을 해제함
+	cout << "현재 소유자 수 : " << hong.use_count() << endl;
+
+	return 0;
+}
+
+Person::Person(const string& name, int age)
+{
+	name_ = name;
+	age_ = age;
+	cout << "생성자 호출됨" << endl;
+}
+
+void Person::ShowPersonInfo()
+{
+	cout << name_ << "의 나이는 " << age_ << "입니다." << endl;
+}
+
+# [C++] 반복자
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <list>
+using namespace std;
+
+int main(void)
+{
+	// stream iterator
+	vector<int> vc = {1, 2, 3, 4, 5};
+	copy(vc.begin(), vc.end(), ostream_iterator<int>(cout));
+	cout << endl;
+
+	// insert iterator
+	list<int> ls = {20, 30, 40};
+	ls.push_back(50); // back_insert_iterator를 사용함
+	ls.push_front(10); // front_insert_iterator를 사용함
+	copy(ls.begin(), ls.end(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	// reverse iterator
+	copy(ls.rbegin(), ls.rend(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	// constant iterator
+	list<int>::iterator iter;
+	list<int>::const_iterator citer;
+	iter = ls.begin();
+	*iter = 100;
+	citer = ls.end(); // *citer = 300; // 상수 반복자이므로 값의 변경이 불가능함
+
+	for(citer = ls.begin(); citer != ls.end(); citer++)
+	{
+		cout << *citer << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+
+# [C++] 시퀀스 컨테이너
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <deque>
+#include <list>
+#include <forward_list>
+using namespace std;
+
+int main(void)
+{
+	// vector container
+	vector<int> vc = {10, 20, 30};
+	cout << "현재 벡터의 크기는 " << vc.size() << "입니다." << endl;
+	vc.push_back(40);
+	cout << "현재 벡터의 크기는 " << vc.size() << "입니다." << endl;
+	cout << "현재 벡터의 4번째 요소는 " << vc[3] << "입니다." << endl;
+	cout << "현재 벡터의 모든 요소는 ";
+	copy(vc.begin(), vc.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+
+	cout << "--------------------------------------------------" << endl;
+
+	// deque container
+	deque<int> dq = {20};
+	dq.push_back(30); // 데큐의 후방 삽입
+	dq.push_front(10); // 데큐의 전방 삽입
+	cout << "현재 데큐의 모든 요소는 ";
+	copy(dq.begin(), dq.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+	cout << "현재 데큐의 1번째 요소는 " << dq.front() << "입니다." << endl;
+	dq.pop_front(); // 데큐의 전방 삭제
+	cout << "현재 데큐의 모든 요소는 ";
+	copy(dq.begin(), dq.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+
+	cout << "--------------------------------------------------" << endl;
+
+	// list container
+	list<int> ls = {1, 2, 2, 3, 4, 3, 5, 5};
+	ls.unique(); // 연속된 요소들 중에서 반복된 값들을 제거함
+	cout << "현재 리스트의 모든 요소는 ";
+	copy(ls.begin(), ls.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+	ls.sort(); // 요소들을 크기순으로 정렬함
+	ls.unique();
+	cout << "현재 리스트의 모든 요소는 ";
+	copy(ls.begin(), ls.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+
+	cout << "--------------------------------------------------" << endl;
+
+	// forward list container
+	forward_list<int> fls1 = {10, 20, 30, 400};
+	forward_list<int> fls2 = {40, 50};
+	forward_list<int>::iterator itr;
+	fls1.remove(400); // 값이 400인 요소를 제거함
+	cout << "현재 순방향 리스트의 모든 요소는 ";
+	copy(fls1.begin(), fls1.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+	itr = fls1.begin(); // fls1의 1번째 요소를 가리키도록 반복자를 초기화함
+	fls1.splice_after(itr, fls2); // fls2의 모든 요소를 fls1의 1번째 요소 다음에 삽입하고, fls2는 비움
+	cout << "fls1 : ";
+	copy(fls1.begin(), fls1.end(), ostream_iterator<int>(cout, " "));
+	cout << endl << "fls2 : ";
+	copy(fls2.begin(), fls2.end(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	return 0;
+}
+
+# [C++] 연관 컨테이너
+#include <iostream>
+#include <iterator>
+#include <set>
+#include <map>
+using namespace std;
+
+int main(void)
+{
+	int arr[5] = {10, 20, 30, 40, 50};
+	set<int> st(arr, arr+3); // 배열의 일부를 가지고 셋 컨테이너를 생성함
+	cout << "현재 집합의 모든 요소는 ";
+	copy(st.begin(), st.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+	st.insert(60);
+	st.insert(70);
+	st.erase(20);
+	cout << "현재 집합의 모든 요소는 ";
+	copy(st.begin(), st.end(), ostream_iterator<int>(cout, " "));
+	cout << "입니다." << endl;
+
+	cout << "--------------------------------------------------" << endl;
+
+	map<string, int> mp;
+	mp.insert(pair<string, int>("국어", 80)); // 익명의 pair 객체를 생성하여 추가함
+	mp["수학"] = 100; // 첨자 연산자를 이용하여 추가함
+	cout << "현재 맵의 모든 요소는 다음과 같습니다." << endl;
+	map<string, int>::iterator it;
+	for(it = mp.begin(); it != mp.end(); it++)
+	{
+		cout << it->first << " : " << it->second << endl; // first 멤버 변수는 '키'를, second 멤버 변수는 '값'을 저장함
+	}
+
+	return 0;
+}
+
+# [C++] 컨테이너 어댑터
+#include <iostream>
+#include <stack>
+#include <queue>
+using namespace std;
+
+int main(void)
+{
+	// stack container
+	int decimal = 123;
+	stack<int> st;
+
+	do {
+		st.push(decimal % 2);
+		decimal /= 2;
+	} while(decimal);
+
+	while(!st.empty())
+	{
+		cout << st.top();
+		st.pop();
+	}
+
+	cout << endl << "--------------------------------------------------" << endl;
+
+	// queue container(ex 20개의 피보나치 수열)
+	int n = 20;
+	queue<int> que;
+	que.push(0);
+	que.push(1);
+
+	for(int i = 0; i < n; i++)
+	{
+		int temp = que.front();
+		cout << temp << " ";
+		que.pop();
+		que.push(temp + que.front());
+	}
+
+	cout << endl << "--------------------------------------------------" << endl;
+
+	// priority_queue container
+	priority_queue<int> pq;
+	pq.push(10);
+	pq.push(20);
+	pq.push(300);
+	pq.push(5);
+
+	while(!pq.empty())
+	{
+		cout << pq.top() << " ";
+		pq.pop();
+	}
+
+	return 0;
+}
+
+# [C++] 펑터(함수 객체)
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+#include <functional>
+using namespace std;
+
+int main(void)
+{
+	vector<int> vc = {20, 40, 10, 30};
+
+	sort(vc.begin(), vc.end(), greater<int>()); // functor(함수 객체)를 이용하여 정렬함
+	copy(vc.begin(), vc.end(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	sort(vc.begin(), vc.end(), less<int>()); // functor(함수 객체)를 이용하여 정렬함
+	copy(vc.begin(), vc.end(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	return 0;
+}
+
+# [C++] 스택 풀기
+#include <iostream>
+using namespace std;
+
+void Func3() { throw 0; }
+void Func2() { Func3(); }
+void Func1() { Func2(); }
+
+int main(void)
+{
+	try
+	{
+		Func1();
+		// Func3()에서 예외가 발생(throw)하지만 예외 처리를 할 수 없어서
+		// Func3() -> Func2() -> Func1() -> main()까지 예외가 전달되어,
+		// 예외의 처리는 main() 함수 내의 catch 절에서 수행하게 됨
+	}
+	catch (int ex)
+	{
+		cout << "예외 처리 : " << ex << endl;
+	}
+
+	return 0;
+}
+
+# [C++] Exception 클래스
+#include <iostream>
+#include <exception>
+using namespace std;
+
+void MyErrorHandler()
+{
+	cout << "처리되지 않은 예외가 발생했습니다." << endl;
+	exit(-1);
+}
+
+int main(void)
+{
+	set_terminate(MyErrorHandler);
+
+	try
+	{
+		throw 1;
+	}
+	catch(char* const ex)
+	{
+		// 이 catch절은 정수형 예외를 처리할 수 없음
+	}
+	
+	return 0;
+}
