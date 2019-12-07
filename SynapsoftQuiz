@@ -69,7 +69,7 @@ void Bank::Check(const string& money)
 			exit(0);
 		}
 	}
-	else {}
+	else { }
 }
 
 // 입력 받은 금액을 한글로 변환하는 멤버 함수
