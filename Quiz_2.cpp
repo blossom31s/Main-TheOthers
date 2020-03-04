@@ -6,19 +6,19 @@ using namespace std;
 class ChangeToTheNextLine
 {
 private:
-	string _str; // 입력받은 문자열을 저장하기 위한 변수
-	int _strLength = 0; // 현재 부분문자열(스페이스 공백으로 나누어지는 전체 문자열의 일부분)의 길이를 저장하기 위한 변수
+    string _str; // 입력받은 문자열을 저장하기 위한 변수
+    int _strLength = 0; // 현재 부분문자열(스페이스 공백으로 나누어지는 전체 문자열의 일부분)의 길이를 저장하기 위한 변수
     int _preLength = 0; // 이전 부분문자열의 길이를 저장하기 위한 변수
     int _restLength = 0; // 한 줄에서 부분문자열을 기록하고 남은 부분의 길이를 저장하기 위한 변수
 public:
-	ChangeToTheNextLine(); // 생성자
-	~ChangeToTheNextLine(); // 소멸자
-	void NextLine(const int& lineLength, string& str); // 줄 바꿈 함수
+    ChangeToTheNextLine(); // 생성자
+    ~ChangeToTheNextLine(); // 소멸자
+    void NextLine(const int& lineLength, string& str); // 줄 바꿈 함수
 };
 
 int main(void)
 {
-	ChangeToTheNextLine tester;
+    ChangeToTheNextLine tester;
     string str = "Software      that works.";
 
     tester.NextLine(8, str);
@@ -26,7 +26,7 @@ int main(void)
     // tester.NextLine(5, str);
     // tester.NextLine(4, str);
 
-	return 0;
+    return 0;
 }
 
 ChangeToTheNextLine::ChangeToTheNextLine() { }
@@ -34,7 +34,7 @@ ChangeToTheNextLine::~ChangeToTheNextLine() { }
 
 void ChangeToTheNextLine::NextLine(const int& lineLength, string& str)
 {
-	_str = str; // 입력받은 문자열을 저장함
+    _str = str; // 입력받은 문자열을 저장함
     _restLength = lineLength; // 입력받은 문자열의 길이를 저장함
 
     cout << "Input :" << endl << lineLength << endl << str << endl;
