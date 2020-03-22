@@ -1,0 +1,2804 @@
+# Cracking the Coding Interview(6E)
+01 Arrays and Strings(9)
+02 Linked Lists(8)
+03 Stacks and Queues(6)
+04 Trees and Graphs(12)
+05 Bit Manipulation(8)
+06 Math and Logic Puzzles(10)
+07 Object-Oriented Design(12)
+08 Recursion and Dynamic Programming(14)
+09 Scalability and Memory Limits(8)
+10 Sorting and Searching(11)
+11 Testing(6)
+12 C and C++(11)
+13 Java(8)
+14 Databases(7)
+15 Threads and Locks(7)
+16 Assorted Moderate Problems(26)
+17 Assorted Hard Problems(26)
+
+
+
+------------------------------< CtCI(6E) 1-1(C++) >------------------------------
+
+// # 중복이 없는가:
+// 문자열이 주어졌을 때,
+// 이 문자열에 같은 문자가 중복되어 등장하는지 확인하는 알고리즘을 작성하라.
+// 자료구조를 추가로 사용하지 않고 풀 수 있는 알고리즘 또한 고민하라.
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <bitset>
+using namespace std;
+
+bool isUniqueChars(const string &str)
+{
+	if (str.length() > 128)
+	{
+		return false;
+	}
+	vector<bool> char_set(128);
+	for (int i = 0; i < str.length(); i++)
+	{
+		int val = str[i];
+		if (char_set[val])
+		{
+			return false;
+		}
+		char_set[val] = true;
+	}
+	return true;
+}
+
+bool isUniqueChars_bitvector(const string &str)
+{
+	// Reduce space usage by a factor of 8 using bitvector.
+	// Each boolean otherwise occupies a size of 8 bits.
+	bitset<256> bits(0);
+	for (int i = 0; i < str.length(); i++)
+	{
+		int val = str[i];
+		if (bits.test(val) > 0)
+		{
+			return false;
+		}
+		bits.set(val);
+	}
+	return true;
+}
+
+bool isUniqueChars_noDS(const string &str)
+{
+	for (int i = 0; i < str.length()-1; i++)
+	{
+		for (int j = i+1; j < str.length(); j++)
+		{
+			if (str[i] == str[j])
+			{
+				return false;
+			}
+		}
+	}
+	return true;	
+}
+
+int main()
+{
+	vector<string> words = {"abcde", "hello", "apple", "kite", "padle"};
+	cout << "Using vector" << endl;
+	for (auto word : words)
+	{
+		cout << word << string(": ") << boolalpha << isUniqueChars(word) << endl;
+	}
+	cout << "------------------------------" << endl;
+	
+	cout << "Using bit vector" << endl;
+	for (auto word : words)
+	{
+		cout << word << string(": ") << boolalpha << isUniqueChars_bitvector(word) << endl;
+	}
+	cout << "------------------------------" << endl;
+
+	cout << "Using no Data Structures" << endl;
+	for (auto word : words)
+	{
+		cout << word << string(": ") << boolalpha << isUniqueChars_noDS(word) << endl;
+	}
+	cout << "------------------------------" << endl;
+
+	return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-2(C++) >------------------------------
+
+// # 순열 확인:
+// 문자열 두 개가 주어졌을 때 이 둘이 서로 순열 관계에 있는지 확인하는 메서드를 작성하라.
+
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+bool arePermutation_usingSort(string str1, string str2)
+{
+    if (str1.length() != str2.length()) return false;
+    
+    sort(str1.begin(), str1.end());
+    sort(str2.begin(), str2.end());
+    for (int i = 0; i < str1.length(); i++)
+        if (str1[i] != str2[i]) return false;
+
+    return true;
+}
+
+bool arePermutation_usingCharacterCount(const string &str1, const string &str2)
+{
+    if (str1.length() != str2.length()) return false;
+
+    int count[256] = {0};
+    for (int i = 0; i < str1.length(); i++)
+    {
+        int val = str1[i];
+        count[val]++;
+    }
+    
+    for (int i = 0; i < str2.length(); i++)
+    {
+        int val = str2[i];
+        count[val]--;
+        if (count[val] < 0) return false;
+    }
+
+    return true;
+}
+
+int main()
+{
+    cout << "Method 1 - Using Sort" << endl;
+
+    string str1 = "testest";
+    string str2 = "estxest";
+
+    if (arePermutation_usingSort(str1, str2))
+    {
+        cout << "'" << str1 << "' and '" << str2 << "' are permutation of each other" << endl;
+    }
+    else
+    {
+        cout << "'" << str1 << "' and '" << str2 << "' are not permutation of each other" << endl;
+    }
+
+    string str3 = "hello";
+    string str4 = "oellh";
+
+    if (arePermutation_usingSort(str3, str4))
+    {
+        cout << "'" << str3 << "' and '" << str4 << "' are permutation of each other" << endl;
+    }
+    else
+    {
+        cout << "'" << str3 << "' and '" << str4 << "' are not permutation of each other" << endl;
+    }
+
+    cout << "--------------------------------------------------" << endl << "Method 2 - Using Character Count" << endl;
+
+    str1 = "testest";
+    str2 = "estxest";
+
+    if (arePermutation_usingCharacterCount(str1, str2))
+    {
+        cout << "'" << str1 << "' and '" << str2 << "' are permutation of each other" << endl;
+    }
+    else
+    {
+        cout << "'" << str1 << "' and '" << str2 << "' are not permutation of each other" << endl;
+    }
+
+    str3 = "hello";
+    str4 = "oellh";
+
+    if (arePermutation_usingCharacterCount(str3, str4))
+    {
+        cout << "'" << str3 << "' and '" << str4 << "' are permutation of each other" << endl;
+    }
+    else
+    {
+        cout << "'" << str3 << "' and '" << str4 << "' are not permutation of each other" << endl;
+    }
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-3(C++) >------------------------------
+
+// # UrLify:
+// 문자열에 들어 있는 모든 공백을 '%20'으로 바꾸는 메서드를 작성하라.
+// 최종적으로 모든 문자를 다 담을 수 있을 만큼 충분한 공간이 이미 확보되어 있으며
+// 문자열의 최종 길이가 함께 주어진다고 가정해도 된다.
+// (자바로 구현한다면 배열 안에서 작업할 수 있도록 문자 배열(character array)을 이용하라.)
+
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+void urlify(char *str, int len)
+{
+    int numOfSpaces = 0;
+    int idx = 0;
+
+    for (idx = 0; idx < len; ++idx)
+    {
+        if (str[idx] == ' ')
+        {
+            ++numOfSpaces;
+        }
+    }
+
+    int extendedLen = len + 2 * numOfSpaces;
+    idx = extendedLen - 1;
+
+    for (int j = len - 1; j >= 0; --j)
+    {
+        if (str[j] != ' ')
+        {
+            str[idx--] = str[j];
+        }
+        else
+        {
+            str[idx--] = '0';
+            str[idx--] = '2';
+            str[idx--] = '%';
+        }
+    }
+}
+
+int main()
+{
+    char str[] = "Mr John Smith";
+    cout << "Actual string : " << str << endl;
+
+    urlify(str, strlen(str));
+    cout << "URLified string : " << str << endl;
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-4(C++) >------------------------------
+
+// # 회문 순열:
+// 주어진 문자열이 회문(palindrome)의 순열인지 아닌지 확인하는 함수를 작성하라.
+// 회문이란 앞으로 읽으나 뒤로 읽으나 같은 단어 혹은 구절을 의미하며,
+// 순열이란 문자열을 재배치하는 것을 뜻한다. 회문이 꼭 사전에 등장하는 단어로 제한될 필요는 없다.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int getCharIndex(char c)
+{
+    int idx = -1;
+
+    if (c >= 'a' && c <= 'z')
+    {
+        idx = c - 'a';
+    }
+    else if (c >= 'A' && c <= 'Z')
+    {
+        idx = c - 'A';
+    }
+    return idx;
+}
+
+void countFrequency(const string &str, int *frequency)
+{
+    int idx;
+
+    for (const char &c : str)
+    {
+        idx = getCharIndex(c);
+        if (idx != -1)
+        {
+            ++frequency[idx];
+        }
+    }
+}
+
+bool isPermutationOfPalindrome1(const string &str)
+{
+    int frequency[26] = {0};
+    countFrequency(str, frequency);
+
+    bool oddAppeared = false;
+
+    for (int i = 0; i < 26; ++i)
+    {
+        if (frequency[i] % 2 && oddAppeared)
+        {
+            return false;
+        }
+        else if (frequency[i] % 2 && !oddAppeared)
+        {
+            oddAppeared = true;
+        }
+    }
+    return true;
+}
+
+bool isPermutationOfPalindrome2(const string &str)
+{
+    int oddCount = 0;
+    int frequency[26] = {0};
+    int idx = 0;
+
+    for (const char &c : str)
+    {
+        idx = getCharIndex(c);
+        if (idx != -1)
+        {
+            ++frequency[idx];
+            if (frequency[idx] % 2)
+            {
+                ++oddCount;
+            }
+            else
+            {
+                --oddCount;
+            }
+        }
+    }
+    return (oddCount <= 1);
+}
+
+int toggle(int bitVector, int index)
+{
+    if (index < 0) return bitVector;
+
+    int mask = 1 << index;
+    if ((bitVector & mask) == 0)
+    {
+        bitVector |= mask;
+    }
+    else
+    {
+        bitVector &= ~mask;
+    }
+    return bitVector;
+}
+
+bool isExactlyOneBitSet(int bitVector)
+{
+    return ((bitVector & (bitVector - 1)) == 0);
+}
+
+bool isPermutationOfPalindrome3(const string &str)
+{
+    int bitVector = 0;
+    int id = 0;
+
+    for (const char &c : str)
+    {
+        id = getCharIndex(c);
+        bitVector = toggle(bitVector, id);
+    }
+    return (bitVector == 0 || isExactlyOneBitSet(bitVector));
+}
+
+int main()
+{
+    string str1("Tact Coa");
+    cout << boolalpha << "Does \"" << str1 << "\" has a string whose permutation is a palindrome? " << endl;
+    cout << "Approach 1 : " << isPermutationOfPalindrome1(str1) << endl;
+    cout << "Approach 2 : " << isPermutationOfPalindrome2(str1) << endl;
+    cout << "Approach 3 : " << isPermutationOfPalindrome3(str1) << endl;
+
+    string str2("A big Cat");
+    cout << "Does \"" << str2 << "\" has a string whose permutation is a palindrome? " << endl;
+    cout << "Approach 1 : " << isPermutationOfPalindrome1(str2) << endl;
+    cout << "Approach 2 : " << isPermutationOfPalindrome2(str2) << endl;
+    cout << "Approach 3 : " << isPermutationOfPalindrome3(str2) << endl;
+
+    string str3("Rats live on no evil star");
+    cout << "Does \"" << str3 << "\" has a string whose permutation is a palindrome? " << endl;
+    cout << "Approach 1 : " << isPermutationOfPalindrome1(str3) << endl;
+    cout << "Approach 2 : " << isPermutationOfPalindrome2(str3) << endl;
+    cout << "Approach 3 : " << isPermutationOfPalindrome3(str3) << endl;
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-5(C++) >------------------------------
+
+// # 하나 빼기:
+// 문자열을 편집하는 방법에는 세 가지 종류가 있다. 
+// 문자 삽입, 문자 삭제, 문자 교체.
+// 문자열 두 개가 주어졌을 때, 문자열을 같게 만들기 위한 편집 횟수가
+// 1회 이내인지 확인하는 함수를 작성하라.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+bool isOneAway(string str1, string str2)
+{
+    string bigger, smaller;
+    bigger = str1.length() >= str2.length() ? str1 : str2;
+    smaller = str1.length() < str2.length() ? str1 : str2;
+
+    if (abs(int(bigger.length() - smaller.length())) > 1) return false; // 글자수 차이가 2개 이상인 것은 탈락시킴
+
+    bool mismatchFlag = false;
+    for (int i=0, j=0; i<bigger.length() && j<smaller.length();)
+    {
+        if (bigger[i] != smaller[j])
+        {
+            if (mismatchFlag) return false; // 글자가 2개 이상 다른 경우 탈락시킴
+            mismatchFlag = true;
+            if (bigger.length() == smaller.length()) i++, j++;
+            else i++;
+        }
+        else i++, j++;
+    }
+    return true;    
+}
+
+void translate(bool result, const string str1, const string str2)
+{
+    if (result == true) cout << "'" << str1 << "' and '" << str2 << "' are one away." << endl;
+    else cout << "'" << str1 << "' and '" << str2 << "' are not one away." << endl;
+}
+
+int main()
+{
+    translate(isOneAway("pale", "ple"), "pale", "ple");
+    translate(isOneAway("pale", "pales"), "pale", "pales");
+    translate(isOneAway("pale", "bale"), "pale", "bale");
+    translate(isOneAway("pale", "bake"), "pale", "bake");
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-6(C++) >------------------------------
+
+// # 문자열 압축:
+// 반복되는 문자의 개수를 세는 방식의 기본적인 문자열 압축 메서드를 작성하라.
+// 예를 들어 문자열 aabccccaaa를 압축하면 a2b1c4a3이 된다.
+// 만약 '압축된' 문자열의 길이가 기존 문자열의 길이보다 길다면 기존 문자열을 반환해야 한다.
+// 문자열은 대소문자 알파벳(a~z)으로만 이루어져 있다.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+string compress(string str)
+{
+    if (str.length() < 2) return str; // 원래 문자열의 길이가 2보다 작으면 아래의 for문을 적용할 수 없음
+
+    string out{""};
+    int count = 1;
+    for (int i=0; i<str.length()-1; ++i)
+    {
+        if (str[i] == str[i+1]) ++count;
+        else
+        {
+            out += str[i];
+            out += to_string(count);
+            count = 1;
+        }
+        if (out.length() > str.length()) return str; // 압축되고 있는 문자열이 원래 문자열 보다 길어지면 더 이상 진행할 필요가 없음
+    }
+    out += str[str.length()-1];
+    out += to_string(count);
+
+    if (out.length() > str.length()) return str; // 최종적으로 압축된 문자열과 원래 문자열의 길이를 비교
+    return out;
+}
+
+int main()
+{
+    string str{"aaabbcccccd"};
+    string out{compress(str)};
+
+    if (str.compare(out)) cout << "'" << str << "' can be compressed to '" << out << "'." << endl;
+    else cout << "'" << str << "' can not be compressed." << endl;
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-7(C++) >------------------------------
+
+// # 행렬 회전:
+// 이미지를 표현하는 N×N 행렬이 있다. 이미지의 각 픽셀은 4바이트로 표현된다.
+// 이때, 이미지를 90도 회전시키는 메서드를 작성하라.
+// 행렬을 추가로 사용하지 않고서도 할 수 있겠는가?
+
+#include <iostream>
+using namespace std;
+
+void transpose(int **matrix, int N) // 전치행렬을 구함
+{
+    for (int i=0; i<N; ++i)
+    {
+        for (int j=i+1; j<N; ++j)
+        {
+            if (i != j) swap(matrix[i][j], matrix[j][i]);
+        }
+    }
+}
+
+void reverse(int *row, int N) // 좌우반전의 행렬을 구함
+{
+    for (int i=0; i<N/2; ++i) swap(row[i], row[N-i-1]);
+}
+
+void Rotate1(int **matrix, int N) // clockwise 회전
+{
+    transpose(matrix, N);
+    for (int i=0; i<N; ++i) reverse(matrix[i], N);
+}
+
+void Rotate2(int **matrix, int N) // anticlockwise 회전
+{
+    for (int i=0; i<N/2; ++i)
+    {
+        for (int j=i; j<N-i-1; ++j)
+        {
+            int temp = matrix[i][j];
+            matrix[i][j] = matrix[j][N-i-1];
+            matrix[j][N-i-1] = matrix[N-i-1][N-j-1];
+            matrix[N-i-1][N-j-1] = matrix[N-j-1][i];
+            matrix[N-j-1][i] = temp;
+        }
+    }
+}
+
+void printMatrix(int **matrix, int N)
+{
+    for (int i=0; i<N; ++i)
+    {
+        for (int j=0; j<N; ++j) cout << matrix[i][j] << " ";
+        cout << endl;
+    }
+}
+
+int main()
+{
+    int N=5;
+    int **matrix = new int *[N]; // 행 공간 생성
+    for (int i=0; i<N; ++i) matrix[i] = new int[N]; // 열 공간 생성
+
+    for (int i=0; i<N; ++i)
+    {
+        for (int j=0; j<N; ++j)
+        {
+            matrix[i][j] = i+j;
+        }
+    }
+
+    cout << "Rotated matrix by 90 degree (clockwise) : " << endl;
+    Rotate1(matrix, N);
+    printMatrix(matrix, N);
+
+    cout << "Rotated matrix by 90 degree (anticlockwise) : " << endl;
+    Rotate2(matrix, N);
+    printMatrix(matrix, N);
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-8(C++) >------------------------------
+
+// # 0 행렬:
+// M×N 행렬의 한 원소가 0일 경우,
+// 해당 원소가 속한 행과 열의 모든 원소를 0으로 설정하는 알고리즘을 작성하라.
+
+#include <iostream>
+using namespace std;
+
+void nullifyRow(int **matrix, int row, int N)
+{
+    for (int j=0; j<N; ++j) matrix[row][j] = 0;
+}
+
+void nullifyColumn(int **matrix, int M, int col)
+{
+    for (int i=0; i<M; ++i) matrix[i][col] = 0;
+}
+
+void nullifyMatrix(int **matrix, int M, int N)
+{
+    bool firstRow = false;
+
+    for (int j=0; j<N; ++j) // 첫 번째 행에 0이 있는지 검사함
+    {
+        if (matrix[0][j] == 0)
+        {
+            firstRow = true;
+            break;
+        }
+    }
+
+    for (int i=1; i<M; ++i) // 두 번째 행부터 0이 있는지 검사함
+    {
+        bool thisRowIsNull = false;
+        for (int j=0; j<N; ++j) // 어느 요소에 0이 있는지를 첫 번째 행에 기록함
+        {
+            if (matrix[i][j] == 0)
+            {
+                matrix[0][j] = 0;
+                thisRowIsNull = true;
+            }
+        }
+        if (thisRowIsNull) nullifyRow(matrix, i, N); // 0이 있는 요소의 행을 전부 0으로 만듦
+    }
+
+    for (int j=0; j<N; ++j)
+    {
+        if (matrix[0][j] == 0) nullifyColumn(matrix, M, j); // 첫 번째 행 중에 0이 있는 열을 전부 0으로 만듦
+    }
+
+    if (firstRow) nullifyRow(matrix, 0, N); // 첫 번째 행에 처음부터 0이 있었으면 첫 번째 행을 전부 0으로 만듦
+}
+
+void printMatrix(int **matrix, int M, int N)
+{
+    for (int i=0; i<M; ++i)
+    {
+        for (int j=0; j<N; ++j) cout << matrix[i][j] << " ";
+        cout << endl;
+    }
+}
+
+int main()
+{
+    int M=4, N=5;
+    int **matrix = new int *[M];
+    for (int i=0; i<M; ++i) matrix[i] = new int[N];
+
+    for (int i=0; i<M; ++i)
+    {
+        for (int j=0; j<N; ++j) matrix[i][j] = i+j+1;
+    }
+    matrix[0][1] = 0;
+    matrix[2][3] = 0;
+
+    cout << "Before Nullify : " << endl;
+    printMatrix(matrix, M, N);
+    nullifyMatrix(matrix, M, N);
+    cout << "After Nullify : " << endl;
+    printMatrix(matrix, M, N);
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 1-9(C++) >------------------------------
+
+// # 문자열 회전:
+// 한 단어가 다른 문자열에 포함되어 있는지 판별하는 isSubstring 이라는 메서드가 있다고 하자.
+// s1과 s2의 두 문자열이 주어졌고 s2가 s1을 회전시킨 결과인지 판별하고자 한다.
+// (가령 'waterbottle'은 'erbottlewat'을 회전시켜 얻을 수 있는 문자열이다.)
+// isSubstring 메서드를 한 번만 호출해서 판별할 수 있는 코드를 작성하라.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+bool isRotation(string s1, string s2)
+{
+    if (s1.length()==0 || s2.length()==0 || s1.length()!=s2.length())
+    {
+        cout << "'" << s1 << "' and '" << s2 << "' are not equal in length." << endl;
+        return false;
+    }
+    string concatS1 = s1 + s1;
+    if (concatS1.find(s2) != string::npos) return true;
+    else return false;
+}
+
+int main()
+{
+    string s1{"eat"}, s2{"ate"};
+
+    if (isRotation(s1, s2)) cout << "'" << s2 << "' is a rotation of '" << s1 << "'." << endl;
+    else cout << "'" << s2 << "' is not a rotation of '" << s1 << "'." << endl;
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 2-1(C++) >------------------------------
+
+// # 중복 없애기:
+// 정렬되어 있지 않은 연결리스트가 주어졌을 때
+// 이 리스트에서 중복되는 원소를 제거하는 코드를 작성하라.
+
+// - 연관문제:
+// 임시 버퍼를 사용할 수 없다면 어떻게 풀까?
+
+#include <iostream>
+#include <string>
+#include <random>
+#include <unordered_map>
+using namespace std;
+
+struct Node {
+    int data = 0;
+    Node *next = nullptr;
+};
+
+void insert (Node *&head, int data) {
+    Node *newNode = new Node;
+    newNode->data = data;
+    newNode->next = head;
+    head = newNode;
+}
+
+void printList (Node *head) {
+    while (head) {
+        cout << head->data << " => ";
+        head = head->next;
+    }
+    cout << "nullptr" << endl;
+}
+
+static inline int random_range (const int min, const int max) {
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_int_distribution<int> distribution(min, max);
+    return distribution(mt);
+}
+
+void removeDuplicates1 (Node *head) { // 임시 버퍼를 사용할 수 없을 때
+    if (head == nullptr || (head && (head->next == nullptr))) return;
+    Node *curr = head;
+    while (curr) {
+        Node *runner = curr;
+        while (runner->next != nullptr) {
+            if (runner->next->data == curr->data) {
+                runner->next = runner->next->next;
+            } else {
+                runner = runner->next;
+            }
+        }
+        curr = curr->next;
+    }
+}
+
+void removeDuplicates2 (Node *head) { // 임시 버퍼를 사용할 수 있을 때
+    if (head == nullptr || (head && (head->next == nullptr))) return;
+    unordered_map<int, int> node_map;
+    Node *prev = head;
+    Node *curr = head->next;
+    node_map[head->data] = 1;
+    while (curr != nullptr) {
+        while (curr && node_map.find(curr->data) != node_map.end()) {
+            curr = curr->next;
+        }
+        prev->next = curr;
+        prev = curr;
+        if (curr) {
+            node_map[curr->data] = 1;
+            curr = curr->next;
+        }
+    }
+}
+
+int main() {
+    cout << "Method 1 : " << endl;
+    Node *head = nullptr;
+    for (int i=0; i<10; ++i) {
+        insert(head, random_range(1,7));
+    }
+    printList(head);
+    removeDuplicates1(head);
+    printList(head);
+
+    cout << "Method 2 : " << endl;
+    head = nullptr;
+    for (int i=0; i<10; ++i) {
+        insert(head, random_range(1,7));
+    }
+    printList(head);
+    removeDuplicates2(head);
+    printList(head);
+
+    return 0;
+}
+
+
+
+------------------------------< CtCI(6E) 2-2(C++) >------------------------------
+
+// # 뒤에서 k번째 원소 구하기:
+// 단방향 연결리스트가 주어졌을 때 뒤에서 k번째 원소를 찾는 알고리즘을 구현하라.
+
+#include <iostream>
+using namespace std;
+
+struct Node;
+void generateList(Node *&head, int data);
+void deleteList(Node *&head);
+Node *kthToLastRecursiveHelper(Node *head, int k, int &i);
+Node *kthToLastRecursive(Node *head, int k);
+Node *kthToLastIterative(Node *head, int k);
+Node *kthToLast (Node *head, int k);
+
+int main() {
+    Node *head = nullptr;
+
+    generateList(head, 10);
+    kthToLast(head, 2);
+    deleteList(head);
+
+    return 0;
+}
+
+struct Node {
+    int data;
+    Node *next;
+    Node(int d) : data{ d }, next{ nullptr } { }
+};
+
+void generateList(Node *&head, int data) {
+    for(int i=data; i>0; --i) {
+        Node *newNode = new Node(i);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    cout << "List : ";
+    Node *print = head;
+    while(print) {
+        cout << print->data << " => ";
+        print = print->next;
+    }
+    cout << "null" << endl;
+}
+
+void deleteList(Node *&head) {
+    Node *nextNode;
+    while(head) {
+        nextNode = head->next;
+        delete(head);
+        head = nextNode;
+    }
+}
+
+Node *kthToLastRecursiveHelper(Node *head, int k, int &i) {
+    if(head == nullptr) {
+        return nullptr;
+    }
+
+    Node *node = kthToLastRecursiveHelper(head->next, k, i); // 재귀 방식으로 head의 포인터를 노드의 끝에 위치시킴
+
+    i = i + 1; // 노드의 끝에서부터 하나씩 증가하며, k번째 요소를 찾음
+    if(i == k) {
+        return head;
+    }
+    return node;
+}
+
+Node *kthToLastRecursive(Node *head, int k) {
+    int i = 0;
+    return kthToLastRecursiveHelper(head, k, i);
+}
+
+Node *kthToLastIterative(Node *head, int k) {
+    if(head == nullptr) {
+        return head;
+    }
+
+    Node *ptr1 = head;
+    Node *ptr2 = head;
+
+    int i = 0;
+    while(i < k && ptr1) { // 노드의 끝과 k 사이의 거리 만큼 ptr1을 움직여 놓음
+        ptr1 = ptr1->next;
+        ++i;
+    }
+
+    if(i < k) { // 앞의 while 문에서 ptr1이 노드 범위를 벗어났는지 검사함
+        return nullptr;
+    }
+
+    while(ptr1 != nullptr) { // 노드의 끝과 ptr1 사이의 거리만큼 이동하여 k번째 요소를 찾음
+        ptr1 = ptr1->next;
+        ptr2 = ptr2->next;
+    }
+
+    return ptr2;
+}
+
+Node *kthToLast(Node *head, int k) {
+    cout << k << "th node from last (Recursive) : ";
+    Node *nodeK = kthToLastRecursive(head, k);
+    if(nodeK != nullptr) {
+        cout << nodeK->data << endl;
+    } else {
+        cout << "Null Node" << endl;
+    }
+
+    cout << k << "th node from last (Iterative) : ";
+    nodeK = kthToLastIterative(head, k);
+    if(nodeK != nullptr) {
+        cout << nodeK->data << endl;
+    } else {
+        cout << "Null Node" << endl;
+    }
+
+    return head;
+}
+
+
+
+------------------------------< CtCI(6E) 2-3(C++) >------------------------------
+
+// # 중간 노드 삭제:
+// 단방향 연결리스트가 주어졌을 때 중간(정확히 가운데 노드일 필요는 없고 처음과 끝 노드만 아니면 된다.)
+// 에 있는 노드 하나를 삭제하는 알고리즘을 구현하라.
+// 단, 삭제할 노드에만 접근할 수 있다.
+
+#include <iostream>
+using namespace std;
+
+struct Node;
+void generateNode(Node *&head, char c);
+void deleteNode(Node *head, int n);
+
+int main() {
+    Node *head = nullptr;
+
+    generateNode(head, 'H');
+    deleteNode(head, 3);
+
+    return 0;
+}
+
+struct Node {
+    char data;
+    Node *next;
+    Node(char c) : data{ c }, next{ nullptr } { }
+};
+
+void generateNode(Node *&head, char c) {
+    int idx = -1;
+
+    if(c >= 'A' && c <= 'Z') idx = c - 'A';
+    else if(c >= 'a' && c <= 'z') idx = c - 'a';
+
+    if(idx == -1) cout << "Please enter an alphabet.\n";
+
+    for(int i=idx+1; i>0; --i) {
+        if(c >= 65 && c <= 90) {
+            Node *newNode = new Node(i+64);
+            newNode->next = head;
+            head = newNode;
+        } else {
+            Node *newNode = new Node(i+96);
+            newNode->next = head;
+            head = newNode;
+        }
+    }
+
+    cout << "List before deletion : \n";
+    Node *print = head;
+    while(print) {
+        cout << print->data << " => ";
+        print = print->next;
+    }
+    cout << "nullptr\n";
+}
+
+void deleteNode(Node *head, int n) {
+    if(n <= 1) cout << "Please enter a number of 2 or more.\n";
+    if(head == nullptr || head->next == nullptr) return;
+
+    Node *currNode = head;
+    for(int i=1; i<n; ++i) currNode = currNode->next;
+
+    Node *nextNode = currNode->next;
+    currNode->data = nextNode->data;
+    currNode->next = nextNode->next;
+    delete nextNode;
+
+    cout << "List after " << n << "th node deletion : \n";
+    Node *print = head;
+    while(print) {
+        cout << print->data << " => ";
+        print = print->next;
+    }
+    cout << "nullptr\n";
+}
+
+
+
+------------------------------< CtCI(6E) 2-4(C++) >------------------------------
+
+// # 분할:
+// 값 x가 주어졌을 때 x보다 작은 노드들을 x보다 크거나 같은 노드들보다
+// 앞에 오도록 하는 코드를 작성하라.
+// 만약 x가 리스트에 있다면 x는 그보다 작은 원소들보다 뒤에 나오기만 하면 된다.
+// 즉, 원소 x는 '오른쪽 그룹' 어딘가에 존재하면 된다.
+// 왼쪽과 오른쪽 그룹 사이에 있을 필요는 없다.
+
+#include <iostream>
+#include <random>
+using namespace std;
+
+struct Node;
+void generateList(Node *&head, int listLength);
+void printList(Node *head);
+Node *partitionList(Node *head, int x);
+
+int main() {
+    Node *head = nullptr;
+    int listLength = 10;
+    int x = 5;
+
+    generateList(head, listLength);
+    printList(head);
+    printList(partitionList(head, x));
+
+    return 0;
+}
+
+struct Node {
+    int data;
+    Node *next;
+    Node(int d) : data{ d }, next{ nullptr } { }
+};
+
+void generateList(Node *&head, int listLength) {
+    for(int i=0; i<listLength; ++i) {
+        Node *newNode = new Node((rand() % 9) + 1);
+        if(head == nullptr) {
+            head = newNode;
+        } else {
+            Node *currNode = head;
+            while(currNode->next) {
+                currNode = currNode->next;
+            }
+            currNode->next = newNode;
+        }
+    }
+}
+
+void printList(Node *head) {
+    while(head) {
+        cout << head->data << " => ";
+        head = head->next;
+    }
+    cout << "nullptr" << endl;
+}
+
+Node *partitionList(Node *head, int x) {
+    Node *leftListHead = nullptr;
+    Node *leftListTail = nullptr;
+    Node *rightListHead = nullptr;
+    Node *rightListTail = nullptr;
+    Node *currNode = head;
+    while(currNode) {
+        Node *nextNode = currNode->next;
+        if(currNode->data < x) {
+            if(leftListHead == nullptr) {
+                leftListHead = currNode;
+                leftListTail = currNode;
+            } else {
+                leftListTail->next = currNode;
+                leftListTail = currNode;
+            }
+        } else {
+            if(rightListHead == nullptr) {
+                rightListHead = currNode;
+                rightListTail = currNode;
+            } else {
+                rightListTail->next = currNode;
+                rightListTail = currNode;
+            }
+        }
+        currNode = nextNode;
+    }
+    leftListTail->next = rightListHead;
+    rightListTail->next = nullptr;
+    return leftListHead;
+}
+
+
+
+------------------------------< CtCI(6E) 2-5(C++) >------------------------------
+
+// # 리스트의 합:
+// 연결리스트로 숫자를 표현할 때 각 노드가 자릿수 하나를 가리키는 방식으로 표현할 수 있다.
+// 각 숫자는 역순으로 배열되어 있는데,
+// 즉, 첫 번째 자릿수가 리스트의 맨 앞에 위치하도록 배열된다는 뜻이다.
+// 이와 같은 방식으로 표현된 숫자 두 개가 있을 때,
+// 이 두 수를 더하여 그 합을 연결리스트로 반환하는 함수를 작성하라.
+
+// - 연관문제:
+// 각 자릿수가 정상적으로 배열된다고 가정하고 같은 문제를 풀어 보자.
+
+#include <iostream>
+using namespace std;
+
+struct Node;
+Node *comp_insert_head(Node *&head, int data);
+Node *comp_insert_tail(Node *&head, int data);
+int comp_length(Node *head);
+void comp_pad(Node *&head, int padding);
+Node *env_generateList(int number, char c);
+void env_deleteList(Node *&head);
+void env_printList(Node *head, string str);
+Node *add_ascDigit_iterative(Node *list1, Node *list2, int carry);
+Node *add_ascDigit_recursive(Node *list1, Node *list2, int carry);
+Node *add_descDigit_helper(Node *list1, Node *list2, int &carry);
+Node *add_descDigit(Node *list1, Node *list2, int carry);
+
+int main() {
+    int n1 = 199;
+    int n2 = 1;
+    Node *list1 = env_generateList(n1, 'a');
+    Node *list2 = env_generateList(n2, 'a');
+    Node *list3 = env_generateList(n1, 'd');
+    Node *list4 = env_generateList(n2, 'd');
+    Node *add_ascList_iter = add_ascDigit_iterative(list1, list2, 0);
+    Node *add_ascList_recur = add_ascDigit_recursive(list1, list2, 0);
+    Node *add_descList = add_descDigit(list3, list4, 0);
+
+    cout << "========== Ascending Digit Add (iterative) ==========" << endl;
+    env_printList(list1, "1");
+    env_printList(list2, "2");
+    env_printList(add_ascList_iter, "add");
+
+    cout << "========== Ascending Digit Add (recursive) ==========" << endl;
+    env_printList(list1, "1");
+    env_printList(list2, "2");
+    env_printList(add_ascList_recur, "add");
+
+    cout << "========== Descending Digit Add ==========" << endl;
+    env_printList(list3, "1");
+    env_printList(list4, "2");
+    env_printList(add_descList, "add");
+
+    env_deleteList(list1);
+    env_deleteList(list2);
+    env_deleteList(list3);
+    env_deleteList(list4);
+    env_deleteList(add_ascList_iter);
+    env_deleteList(add_ascList_recur);
+    env_deleteList(add_descList);
+
+    return 0;
+}
+
+struct Node {
+    int data;
+    Node *next;
+    Node(int d) : data{ d }, next{ nullptr } { }
+};
+
+Node *comp_insert_head(Node *&head, int data) {
+    Node *newNode = new Node(data);
+    newNode->next = head;
+    head = newNode;
+    return head;
+}
+
+Node *comp_insert_tail(Node *&head, int data) {
+    Node *newNode = new Node(data);
+    if(head == nullptr) {
+        head = newNode;
+    } else {
+        Node *move = head;
+        while(move->next) {
+            move = move->next;
+        }
+        move->next = newNode;
+    }
+    return head;
+}
+
+int comp_length(Node *head) {
+    int len = 0;
+    while(head) {
+        len++;
+        head = head->next;
+    }
+    return len;
+}
+
+void comp_pad(Node *&head, int padding) {
+    for(int i=0; i<padding; ++i) comp_insert_head(head, 0);
+}
+
+Node *env_generateList(int number, char c) {
+    if(number <= 0) cout << "Please enter a positive integer." << endl;
+
+    int temp = number;
+    int number_length = 1;
+    while((temp / 10) != 0) {
+        temp /= 10;
+        ++number_length;
+    }
+
+    Node *head = nullptr;
+    temp = number;
+    for(int i=0; i<number_length; ++i) {
+        if(c == 'a') comp_insert_tail(head, temp % 10); // a : 자리수 오름차순
+        if(c == 'd') comp_insert_head(head, temp % 10); // d : 자리수 내림차순
+        temp /= 10;
+    }
+    return head;
+}
+
+void env_deleteList(Node *&head) {
+    Node *nextNode;
+    while(head) {
+        nextNode = head->next;
+        delete(head);
+        head = nextNode;
+    }
+}
+
+void env_printList(Node *head, string str) {
+    cout << "list(" << str << ") : ";
+    while(head) {
+        cout << head->data << " => ";
+        head = head->next;
+    }
+    cout << "nullptr" << endl;
+}
+
+Node *add_ascDigit_iterative(Node *list1, Node *list2, int carry) {
+    Node *add_list = nullptr;
+    Node *add_list_move = nullptr;
+    int value = 0;
+
+    while(list1 || list2) {
+        value = carry + (list1 ? list1->data : 0) + (list2 ? list2->data : 0);
+        if(value > 9) {
+            carry = 1;
+            value %= 10;
+        } else {
+            carry = 0;
+        }
+
+        Node *temp = new Node(value);
+        if(add_list == nullptr) add_list = temp;
+        else add_list_move->next = temp;
+        add_list_move = temp;
+
+        if(list1) list1 = list1->next;
+        if(list2) list2 = list2->next;
+    }
+
+    if(carry > 0) add_list_move->next = new Node(carry);
+
+    return add_list;
+}
+
+Node *add_ascDigit_recursive(Node *list1, Node *list2, int carry) {
+    if(list1 == nullptr && list2 == nullptr && carry == 0) return nullptr;
+
+    int value = carry + (list1 ? list1->data : 0) + (list2 ? list2->data : 0);
+    Node *add_list = new Node(value % 10);
+    add_list->next = add_ascDigit_recursive(list1 ? list1->next : nullptr,
+                                            list2 ? list2->next : nullptr,
+                                            value > 9 ? 1 : 0);
+    return add_list;
+}
+
+Node *add_descDigit_helper(Node *list1, Node *list2, int &carry) {
+    if(list1 == nullptr && list2 == nullptr && carry == 0) return nullptr;
+
+    Node *add_list = add_descDigit_helper(list1 ? list1->next : nullptr,
+                                          list2 ? list2->next : nullptr,
+                                          carry);
+
+    int value = carry + (list1 ? list1->data : 0) + (list2 ? list2->data : 0);
+    comp_insert_head(add_list, value % 10);
+    carry = (value > 9) ? 1 : 0;
+
+    return add_list;
+}
+
+Node *add_descDigit(Node *list1, Node *list2, int carry) {
+    int len1 = comp_length(list1);
+    int len2 = comp_length(list2);
+    if(len2 < len1) comp_pad(list2, len1 - len2);
+    if(len1 < len2) comp_pad(list1, len2 - len1);
+
+    Node *add_list = add_descDigit_helper(list1, list2, carry);
+    if(carry) comp_insert_head(add_list, carry);
+
+    return add_list;
+}
+
+
+
+------------------------------< CtCI(6E) 2-6(C++) >------------------------------
+
+// # 회문:
+// 주어진 연결리스트가 회문(palindrome)인지 검사하는 함수를 작성하라.
+
+#include <iostream>
+#include <string>
+#include <stack>
+using namespace std;
+
+struct Node;
+Node *compo_insertHead(Node *&head, string data);
+void compo_reverse(Node *&head);
+Node *env_generateList(string str);
+void env_deleteList(Node *&head);
+void env_printResult(string str, string ctr);
+bool isPalindrome_iter_reverse(Node *head);
+bool isPalindrome_iter_stack(Node *head);
+bool isPalindrome_recurHelper(Node *&left, Node *right);
+bool isPalindrome_recur(Node *head);
+
+int main() {
+    string str1 = "abcba";
+    string str2 = "hello";
+
+    cout << endl << "==========< isPalindrome_iterative(1) >==========" << endl;
+    env_printResult(str1, "it");
+    env_printResult(str2, "it");
+
+    cout << endl << "==========< isPalindrome_iterative(2) >==========" << endl;
+    env_printResult(str1, "st");
+    env_printResult(str2, "st");
+
+    cout << endl << "==========< isPalindrome_recursive >==========" << endl;
+    env_printResult(str1, "re");
+    env_printResult(str2, "re");
+
+    return 0;
+}
+
+struct Node {
+    string data;
+    Node *next;
+    Node(string d) : data{ d }, next{ nullptr } { }
+};
+
+Node *compo_insertHead(Node *&head, string data) {
+    Node *newNode = new Node(data);
+    newNode->next = head;
+    head = newNode;
+
+    return head;
+}
+
+void compo_reverse(Node *&head) {
+    if(head == nullptr || (head && (head->next == nullptr))) return;
+
+    Node *newHead = nullptr;
+    Node *nextNode = nullptr;
+    while(head) {
+        nextNode = head->next;
+        head->next = newHead;
+        newHead = head;
+        head = nextNode;
+    }
+    head = newHead;
+}
+
+Node *env_generateList(string str) {
+    if(str == "") cout << "Please enter a string." << endl;
+
+    string temp1 = str;
+    Node *head = nullptr;
+    for(int i=0; i<str.length(); ++i) {
+        string temp2 = temp1.substr(temp1.length()-1, 1);
+        compo_insertHead(head, temp2);
+        temp1.erase(temp1.length()-1, 1);
+    }
+
+    return head;
+}
+
+void env_deleteList(Node *&head) {
+    Node *nextNode;
+    while(head) {
+        nextNode = head->next;
+        delete(head);
+        head = nextNode;
+    }
+}
+
+void env_printResult(string str, string ctr) {
+    Node *head = env_generateList(str);
+    bool isPalindrome;
+
+    if(ctr == "it") isPalindrome = isPalindrome_iter_reverse(head);
+    if(ctr == "st") isPalindrome = isPalindrome_iter_stack(head);
+    if(ctr == "re") isPalindrome = isPalindrome_recur(head);
+
+    if(isPalindrome) cout << "'" << str << "' is a palindrome." << endl;
+    else cout << "'" << str << "' is not a palindrome." << endl;
+
+    env_deleteList(head);
+}
+
+bool isPalindrome_iter_reverse(Node *head) {
+    if(head == nullptr || head->next == nullptr) return true;
+
+    Node *ptr1 = head;
+    Node *ptr2 = head;
+
+    while(ptr2 && ptr1 && ptr1->next) {
+        ptr1 = ptr1->next->next;
+        ptr2 = ptr2->next;
+    }
+    // 주어진 회문의 길이가 홀수인 경우 ptr2를 회문 후반부의 처음에 위치시킴
+    if(ptr1 && ptr1->next == nullptr) ptr2 = ptr2->next;
+    compo_reverse(ptr2);
+    ptr1 = head;
+
+    while(ptr1 && ptr2 && ptr1->data == ptr2->data) {
+        ptr1 = ptr1->next;
+        ptr2 = ptr2->next;
+    }
+
+    if(ptr2 == nullptr) return true;
+    else return false;
+}
+
+bool isPalindrome_iter_stack(Node *head) {
+    if(head == nullptr || head->next == nullptr) return true;
+
+    Node *ptr1 = head;
+    Node *ptr2 = head;
+    stack<Node*> nodeStack;
+
+    while(ptr2 && ptr1 && ptr1->next) {
+        ptr1 = ptr1->next->next;
+        nodeStack.push(ptr2);
+        ptr2 = ptr2->next;
+    }
+    if(ptr1 && ptr1->next == nullptr) ptr2 = ptr2->next;
+
+    while(!nodeStack.empty() && ptr2) {
+        Node *temp = nodeStack.top();
+        nodeStack.pop();
+        if(temp->data != ptr2->data) return false;
+        ptr2 = ptr2->next;
+    }
+
+    return true;
+}
+
+bool isPalindrome_recurHelper(Node *&left, Node *right) {
+    if(right == nullptr) return true;
+
+    bool isPalindrome = isPalindrome_recurHelper(left, right->next);
+    if(!isPalindrome) return false;
+
+    isPalindrome = (left->data == right->data);
+    left = left->next;
+
+    return isPalindrome;
+}
+
+bool isPalindrome_recur(Node *head) {
+    return isPalindrome_recurHelper(head, head);
+}
+
+
+
+------------------------------< CtCI(6E) 2-7(C++) >------------------------------
+
+// # 교집합:
+// 단방향 연결리스트 두 개가 주어졌을 때
+// 이 두 리스트의 교집합 노드를 찾은 뒤 반환하는 코드를 작성하라.
+// 여기서 교집합이란 노드의 값이 아니라 노드의 주소가 완전히 같은 경우를 말한다.
+// 즉, 첫 번째 리스트에 있는 k번째 노드와 두 번째 리스트에 있는 j번째 노드가
+// 주소까지 완전히 같다면 이 노드는 교집합의 원소가 된다.
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+struct Node;
+Node *tool_insertHead(Node *&head);
+Node *tool_insertTail(Node *&head, int data);
+int tool_length(Node *head);
+Node *list_generate(int number);
+void list_delete(Node *&head);
+void list_print(Node *head, string str);
+void intersection_generate(Node *&front, Node *back, int posF, int posB);
+Node *intersection_search(Node *list1, Node *list2);
+void intersection_print(Node *list1, Node *list2);
+
+int main() {
+    Node *list1 = list_generate(13265);
+    Node *list2 = list_generate(2467853);
+
+    cout << endl << "==========< Before Intersecting >==========" << endl;
+    list_print(list1, "1");
+    list_print(list2, "2");
+
+    cout << endl << "==========< After Intersecting >==========" << endl;
+    intersection_generate(list1, list2, 2, 5); // list1과 list2에서 이을 노드의 위치
+    list_print(list1, "1");
+    list_print(list2, "2");
+    intersection_print(list1, list2);
+
+    list_delete(list1);
+    list_delete(list2);
+
+    return 0;
+}
+
+struct Node {
+    int data;
+    Node *next;
+    Node(int d) : data{ d }, next{ nullptr } { }
+};
+
+Node *tool_insertHead(Node *&head, int data) {
+    Node *newNode = new Node(data);
+    newNode->next = head;
+    head = newNode;
+
+    return head;
+}
+
+Node *tool_insertTail(Node *&head, int data) {
+    Node *newNode = new Node(data);
+    if(head == nullptr) {
+        head = newNode;
+    } else {
+        Node *move = head;
+        while(move->next) {
+            move = move->next;
+        }
+        move->next = newNode;
+    }
+    return head;
+}
+
+int tool_length(Node *head) {
+    int len = 0;
+    while(head) {
+        ++len;
+        head = head->next;
+    }
+    return len;
+}
+
+Node *list_generate(int number) {
+    if(number <= 0) cout << "Please enter a positive integer." << endl;
+
+    int temp = number;
+    int len = 1;
+    while((temp / 10) != 0) {
+        temp /= 10;
+        ++len;
+    }
+
+    Node *head = nullptr;
+    temp = number;
+    for(int i=0; i<len; ++i) {
+        tool_insertHead(head, temp % 10);
+        temp /= 10;
+    }
+
+    return head;
+}
+
+void list_delete(Node *&head) {
+    Node *nextNode;
+    while(head) {
+        nextNode = head->next;
+        delete(head);
+        head = nextNode;
+    }
+}
+
+void list_print(Node *head, string str) {
+    cout << "list(" << str << ") : ";
+    while(head) {
+        cout << head->data << " => ";
+        head = head->next;
+    }
+    cout << "nullptr" << endl;
+}
+
+void intersection_generate(Node *&front, Node *back, int posF, int posB) {
+    int lenF = tool_length(front);
+    int lenB = tool_length(back);
+    if((posF > lenF) || (posB > lenB)) cout << "Please re-enter the appropriate point." << endl;
+
+    // 새로운 리스트 생성
+    Node *ptrF = front;
+    Node *newFront = new Node(front->data);
+    for(int i=0; i<posF-1; ++i) {
+        ptrF = ptrF->next;
+        tool_insertTail(newFront, ptrF->data);
+    }
+    front = newFront;
+
+    // 새로운 리스트의 끝에 ptrF를 위치시킴
+    ptrF = front;
+    while(ptrF->next) ptrF = ptrF->next;
+
+    // 기존의 리스트에서 두 노드를 이을 곳에 ptrB를 위치시킴
+    Node *ptrB = back;
+    for(int i=0; i<posB-1; ++i) ptrB = ptrB->next;
+
+    // 교차점 노드 생성
+    ptrF->next = ptrB; // exited with code=3221226356 결함발생
+}
+
+Node *intersection_search(Node *list1, Node *list2) {
+    int len1 = tool_length(list1);
+    int len2 = tool_length(list2);
+    Node *ptr1 = (len1 > len2) ? list1 : list2;
+    Node *ptr2 = (len2 < len1) ? list2 : list1;
+    int i = 0;
+    while(i < abs(len1 - len2)) {
+        ptr1 = ptr1->next;
+        ++i;
+    }
+
+    while(ptr1 && ptr2) {
+        if(ptr1 == ptr2) return ptr1; // 두 노드의 주소가 같은지 검사함
+        ptr1 = ptr1->next;
+        ptr2 = ptr2->next;
+    }
+    return nullptr;
+}
+
+void intersection_print(Node *list1, Node *list2) {
+    Node *intersection = intersection_search(list1, list2);
+
+    if(intersection) cout << "Intersecting node of lists is : " << intersection->data << endl;
+    else cout << "Lists have no intersection." << endl;
+}
+
+
+
+------------------------------< CtCI(6E) 2-8(C++) >------------------------------
+
+// # 루프 발견:
+// 순환 연결리스트(circular linked list)가 주어졌을 때,
+// 순환되는 부분의 첫째 노드를 반환하는 알고리즘을 작성하라.
+// 순환 연결리스트란 노드의 next포인터가 앞선 노드들 가운데 어느 하나를 가리키도록 설정되어 있는,
+// 엄밀히 말해서는 변질된 방식의 연결리스트를 의미한다.
+
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node *next;
+    Node(int d) : data{ d }, next{ nullptr } { }
+};
+
+Node *list_insertHead(Node *&head, int data);
+Node *list_generate(int number);
+void list_delete(Node *&head);
+void list_print(Node *head, string str);
+Node *loop_detect(Node *head);
+void loop_remove(Node *head, Node *collision);
+
+int main() {
+    int n = 1352468;
+    Node *list = list_generate(n);
+
+    list_print(list, "before");
+
+    cout << "Inserting loop, Connecting end to 5" << endl;
+    list->next->next->next->next->next->next->next = list->next->next;
+
+    cout << "Detecting and Deleting Loop" << endl;
+    Node *collision = loop_detect(list);
+    loop_remove(list, collision);
+
+    list_print(list, "after");
+
+    list_delete(list);
+
+    return 0;
+}
+
+Node *list_insertHead(Node *&head, int data) {
+    Node *newNode = new Node(data);
+    newNode->next = head;
+    head = newNode;
+
+    return head;
+}
+
+Node *list_generate(int number) {
+    if(number <= 0) cout << "Please enter a positive integer." << endl;
+
+    int temp = number;
+    int len = 1;
+    while((temp / 10) != 0) {
+        temp /= 10;
+        ++len;
+    }
+
+    Node *head = nullptr;
+    temp = number;
+    for(int i=0; i<len; ++i) {
+        list_insertHead(head, temp % 10);
+        temp /= 10;
+    }
+
+    return head;
+}
+
+void list_delete(Node *&head) {
+    Node *nextNode;
+    while(head->next) {
+        nextNode = head->next;
+        delete(head);
+        head = nextNode;
+    }
+}
+
+void list_print(Node *head, string str) {
+    cout << "list(" << str << ") : ";
+    while(head) {
+        cout << head->data << " => ";
+        head = head->next;
+    }
+    cout << "nullptr" << endl;
+}
+
+Node *loop_detect(Node *head) {
+    if(head == nullptr) cout << "There is no loop." << endl;
+
+    Node *fastPtr = head;
+    Node *slowPtr = head;
+    while(slowPtr && fastPtr && fastPtr->next) {
+        fastPtr = fastPtr->next->next;
+        slowPtr = slowPtr->next;
+        if(fastPtr == slowPtr) return slowPtr;
+    }
+    cout << "There is no loop." << endl;
+    return nullptr;
+}
+
+void loop_remove(Node *head, Node *collision) {
+    Node *ptr1 = head;
+    Node *ptr2 = collision;
+    while(ptr1->next != ptr2->next) {
+        ptr1 = ptr1->next;
+        ptr2 = ptr2->next;
+    }
+    ptr2->next = nullptr;
+}
+
+
+
+------------------------------< CtCI(6E) 3-1(C++) >------------------------------
+
+// # 한 개로 세 개:
+// 배열 한 개로 스택 세 개를 어떻게 구현할지 설명하라.
+
+#include <iostream>
+using namespace std;
+
+class FixedMultiStack {
+private:
+    int _totalStack;
+    int _stackCapacity;
+    int _totalSize;
+    int *_used;
+    int *_stackArray;
+public:
+    FixedMultiStack(const int totalStack, const int stackCapacity);
+    ~FixedMultiStack();
+    void push(int stackNumber, int data);
+    int pop(int stackNumber);
+    void condition();
+};
+
+int main() {
+    FixedMultiStack tester(3, 5);
+    cout << endl << "Initial Condition" << endl;
+    tester.condition();
+
+    cout << endl << "After Push" << endl;
+    tester.push(1, 1);
+    tester.push(1, 4);
+    tester.push(1, 6);
+    tester.push(1, 7);
+    tester.push(2, 5);
+    tester.push(2, 8);
+    tester.push(3, 2);
+    tester.condition();
+
+    cout << endl << "After Pop" << endl;
+    tester.pop(2);
+    tester.pop(2);
+    tester.condition();
+}
+
+FixedMultiStack::FixedMultiStack(const int totalStack, const int stackCapacity) {
+    this->_totalStack = totalStack;
+    this->_stackCapacity = stackCapacity;
+    this->_totalSize = _totalStack * _stackCapacity;
+    _used = new int[_totalStack] { 0 };
+    _stackArray = new int[_totalSize] { 0 };
+}
+
+FixedMultiStack::~FixedMultiStack() {
+    delete [] _used;
+    delete [] _stackArray;
+}
+
+void FixedMultiStack::push(int stackNumber, int data) { // stackNumber : 1~3
+    if(data < 1 || data > 9) {
+        cout << "Please enter an integer between 1 and 9." << endl;
+    } else if(_used[stackNumber - 1] == _stackCapacity) {
+        cout << "This stack is full." << endl;
+    } else {
+        int start = (stackNumber - 1) * _stackCapacity;
+        int end = start + _stackCapacity;
+        for(int i=start; i<end; ++i) {
+            if(_stackArray[i] == 0) {
+                _stackArray[i] = data;
+                ++_used[stackNumber - 1];
+                return;
+            }
+        }
+    }
+}
+
+int FixedMultiStack::pop(int stackNumber) {
+    if(_used[stackNumber - 1] == 0) {
+        cout << "This stack is empty." << endl;
+        return -1;
+    }
+    else {
+        int start = (stackNumber - 1) * _stackCapacity;
+        int end = start + _stackCapacity;
+        int value;
+        for(int i=end-1; i>=start; --i) {
+            if(_stackArray[i] != 0) {
+                --_used[stackNumber - 1];
+                value = _stackArray[i];
+                _stackArray[i] = 0;
+                return value;
+            }
+        }
+    }
+    return -1;
+}
+
+void FixedMultiStack::condition() {
+    for(int i=0; i<_totalStack; ++i) {
+        cout << "Stack(" << i+1 << ") : ";
+        int start = i * _stackCapacity;
+        int end = start + _stackCapacity;
+        for(int j=start; j<end; ++j) cout << _stackArray[j] << " ";
+        cout << endl;
+    }
+}
+
+
+
+------------------------------< CtCI(6E) 3-2(C++) >------------------------------
+
+// # 스택 Min:
+// 기본적인 push와 pop 기능이 구현된 스택에서 최솟값을 반환하는 min 함수를 추가하려고 한다.
+// 어떻게 설계할 수 있겠는가?
+// push, pop, min 연산은 모두 O(1) 시간에 동작해야 한다.
+
+#include <iostream>
+using namespace std;
+
+class Stack {
+private:
+    int size;
+    int used;
+    int min;
+    int *stackArray;
+public:
+    Stack(int size);
+    ~Stack();
+    void push(int data);
+    int pop();
+    void checkMin();
+    void condition();
+};
+
+int main() {
+    Stack tester(10);
+
+    cout << endl << "Initial Condition" << endl;
+    tester.condition();
+
+    cout << endl << "After Push" << endl;
+    for(auto v : {9, 4, 2, 7, 8, 6, 5, 1}) {
+        tester.push(v);
+    }
+    tester.condition();
+
+    cout << endl << "After Pop" << endl;
+    tester.pop();
+    tester.pop();
+    tester.condition();
+
+    return 0;
+}
+
+Stack::Stack(int size) {
+    this->size = size;
+    this->used = 0;
+    this->min = 10;
+    stackArray = new int[this->size] { 0 };
+}
+
+Stack::~Stack() {
+    delete [] stackArray;
+}
+
+void Stack::push(int data) {
+    if(data < 1 || data > 9) cout << "Please enter an integer between 1 and 9." << endl;
+    else if(used == size) cout << "This stack is full." << endl;
+    else {
+        stackArray[used] = data;
+        ++used;
+        checkMin();
+    }
+}
+
+int Stack::pop() {
+    if(used == 0) {
+        cout << "This stack is empty." << endl;
+        return -1;
+    }
+    else {
+        int temp = stackArray[used-1];
+        stackArray[used-1] = 0;
+        --used;
+        checkMin();
+        return temp;
+    }
+}
+
+void Stack::checkMin() {
+    min = 10;
+    for(int i=0; i<size; ++i) {
+        if((stackArray[i] != 0) && (stackArray[i] < min)) min = stackArray[i];
+    }
+}
+
+void Stack::condition() {
+    cout << "Stack : ";
+    for(int i=0; i<size; ++i) {
+        cout << stackArray[i] << " ";
+    }
+    cout << endl << "Minimum : " << min << endl;
+}
+
+
+
+------------------------------< CtCI(6E) 3-3(?) >------------------------------
+
+// # 접시 무더기:
+// 접시 무더기를 생각해 보자. 접시를 너무 높이 쌓으면 무너져 내릴 것이다.
+// 따라서 현실에서는 접시를 쌓다가 무더기 높이가 어느 정도 높아지면 새로운 무더기를 만든다.
+// 이것을 흉내 내는 자료구조 SetOfStacks를 구현해 보라.
+// SetOfStacks는 여러 개의 스택으로 구성되어 있으며,
+// 이전 스택이 지정된 용량을 초과하는 경우 새로운 스택을 생성해야 한다.
+// SetOfStacks.push()와 SetOfStacks.pop()은 스택이 하나인 경우와 동일하게 동작해야 한다.
+// (다시 말해, pop()은 정확히 하나의 스택이 있을 때와 동일한 값을 반환해야 한다.)
+
+// - 연관문제:
+// 특정한 하위 스택에 대해서 pop을 수행하는 popAt(int index) 함수를 구현하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 3-4(?) >------------------------------
+
+// # 스택으로 큐:
+// 스택 두 개로 큐 하나를 구현한 MyQueue 클래스를 구현하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 3-5(?) >------------------------------
+
+// # 스택 정렬:
+// 가장 작은 값이 위로 오도록 스택을 정렬하는 프로그램을 작성하라.
+// 추가적으로 하나 정도의 스택은 사용해도 괜찮지만,
+// 스택에 보관된 요소를 배열 등의 다른 자료구조로 복사할 수는 없다.
+// 스택은 push, pop, peek, isEmpty의 네 가지 연산을 제공해야 한다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 3-6(?) >------------------------------
+
+// # 동물 보호소:
+// 먼저 들어온 동물이 먼저 나가는 동물 보호소(animal shelter)가 있다고 하자.
+// 이 보호소는 개와 고양이만 수용한다.
+// 사람들은 보호소에서 가장 오래된 동물부터 입양할 수 있는데,
+// 개와 고양이 중 어떤 동물을 데려갈지 선택할 수 있다.
+// 하지만 특정한 동물을 지정해 데려갈 수는 없다.
+// 이 시스템을 자료구조로 구현하라.
+// 이 자료구조는 enqueue, dequeueAny, dequeueDog, dequeueCat의 연산을 제공해야 한다.
+// 기본적으로 탑재되어 있는 LinkedList 자료구조를 사용해도 좋다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-1(?) >------------------------------
+
+// # 노드 사이의 경로:
+// 방향 그래프가 주어졌을 때 두 노드 사이에 경로가 존재하는지 확인하는 알고리즘을 작성하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-2(?) >------------------------------
+
+// # 최소 트리:
+// 오름차순으로 정렬된 배열이 있다. 이 배열 안에 들어 있는 원소는 정수이며
+// 중복된 값이 없다고 했을 때 높이가 최소가 되는 이진 탐색 트리를 만드는 알고리즘을 작성하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-3(?) >------------------------------
+
+// # 깊이의 리스트:
+// 이진 트리가 주어졌을 때 같은 깊이에 있는 노드를 연결리스트로 연결해 주는 알고리즘을 설계하라.
+// 즉, 트리가 깊이가 D라면 D개의 연결리스트를 만들어야 한다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-4(?) >------------------------------
+
+// # 균형 확인:
+// 이진 트리가 균형 잡혀있는지 확인하는 함수를 작성하라.
+// 이 문제에서 균형 잡힌 트리란 모든 노드에 대해서
+// 왼쪽 부분 트리의 높이와 오른쪽 부분 트리의 높이의 차이가 최대 하나인 트리를 의미한다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-5(?) >------------------------------
+
+// # BST 검증:
+// 주어진 이진 트리가 이진 탐색 트리인지 확인하는 함수를 작성하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-6(?) >------------------------------
+
+// # 후속자:
+// 이진 탐색 트리에서 주어진 노드의 '다음'노드(중위 후속자(in-order successor))를
+// 찾는 알고리즘을 작성하라.
+// 각 노드에는 부모 노드를 가리키는 링크가 존재한다고 가정하자.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-7(?) >------------------------------
+
+// # 순서 정하기:
+// 프로젝트의 리스트와 프로젝트들 간의 종속 관계
+// (즉, 프로젝트 쌍이 리스트로 주어지면 각 프로젝트 쌍에서
+// 두 번째 프로젝트가 첫 번째 프로젝트에 종속되어 있다는 뜻)
+// 가 주어졌을 때, 프로젝트를 수행해 나가는 순서를 찾으라.
+// 유효한 순서가 존재하지 않으면 에러를 반환한다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-8(?) >------------------------------
+
+// # 첫 번째 공통 조상:
+// 이진 트리에서 노드 두 개가 주어졌을 때 이 두 노드의 첫 번째 공통 조상을 찾는
+// 알고리즘을 설계하고 그 코드를 작성하라.
+// 자료구조 내에 추가로 노드를 저장해 두면 안 된다.
+// 반드시 이진 탐색 트리일 필요는 없다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-9(?) >------------------------------
+
+// # BST 수열:
+// 배열의 원소를 왼쪽에서부터 차례로 트리에 삽입함으로써 이진 탐색 트리를 생성할 수 있다.
+// 이진 탐색 트리 안에서 원소가 중복되지 않는다고 할 때,
+// 해당 트리를 만들어 낼 수 있는 가능한 배열을 모두 출력하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-10(?) >------------------------------
+
+// # 하위 트리 확인:
+// 두 개의 커다란 이진 트리 T1과 T2가 있다고 하자.
+// T1이 T2보다 훨씬 크다고 했을 때,
+// T2가 T1의 하위 트리(subtree)인지 판별하는 알고리즘을 만들라.
+// T1 안에 있는 노드 n의 하위 트리가 T2와 동일하면, T2는 T1의 하위 트리다.
+// 다시 말해, T1에서 노드 n의 아래족을 끊어 냈을 때 그 결과가 T2와 동일해야 한다.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-11(?) >------------------------------
+
+// # 임의의 노드:
+// 이진 트리 클래스를 바닥부터 구현하려고 한다.
+// 노드의 삽입, 검색, 삭제뿐만 아니라 임의의 노드를 반환하는 getRandomNode() 메서드도 구현한다.
+// 모든 노드를 같은 확률로 선택해주는 getRandomNode 메서드를 설계하고 구현하라.
+// 또한 나머지 메서드는 어떻게 구현할지 설명하라.
+
+?
+
+
+
+------------------------------< CtCI(6E) 4-12(?) >------------------------------
+
+// # 합의 경로:
+// 각 노드의 값이 정수(음수 및 양수)인 이진 트리가 있다.
+// 이때 정수의 합이 특정 값이 되도록 하는 경로의 개수를 세려고 한다.
+// 경로가 꼭 루트에서 시작해서 말단 노드에서 끝날 필요는 없지만
+// 반드시 아래로 내려가야 한다.
+// 즉, 부모 노드에서 자식 노드로만 움직일 수 있다.
+// 알고리즘을 어떻게 설계할 것인가?
+
+?
+
+
+
+------------------------------< CtCI(6E) 5-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 5-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 6-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 7-12(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-12(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-13(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 8-14(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 9-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 10-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 11-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 12-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 13-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 14-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 15-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-12(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-13(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-14(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-15(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-16(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-17(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-18(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-19(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-20(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-21(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-22(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-23(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-24(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-25(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 16-26(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-1(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-2(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-3(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-4(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-5(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-6(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-7(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-8(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-9(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-10(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-11(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-12(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-13(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-14(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-15(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-16(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-17(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-18(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-19(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-20(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-21(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-22(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-23(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-24(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-25(?) >------------------------------
+
+
+
+------------------------------< CtCI(6E) 17-26(?) >------------------------------
+
+
+
